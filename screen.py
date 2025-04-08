@@ -7,6 +7,9 @@ from hide_room import hide_room
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email_notification_system import email_notification_system
+from json_code import json_storage
+import json
+import os
 
 
 class Application(tk.Frame):
@@ -171,20 +174,9 @@ class Application(tk.Frame):
         # メール送信結果を表示するラベル
         self.result_label = tk.Label(self, text="", fg="black")
         self.result_label.place(x=10, y=560)
+        
+        self.button_reservation = tk.Button(self, text="予約（確定）", command=self.process_reservation)
 
-        # 予約ボタン
-        self.button_reservation = tk.Button(
-            self,
-            text="予約（確定）",
-            command=lambda: email_notification_system(
-                email=self.email,  # Tkinter Entryの値を取得
-                last_name=self.last_name,  # Tkinter Entryの値を取得
-                banquet_var=self.banquet_var,  # Tkinter StringVarの値を取得
-                people=self.people,  # Tkinter Comboboxの値を取得
-                room_name=self.room_name,  # Tkinter Comboboxの値を取得
-                result_label=self.result_label,  # 結果表示用のラベル
-            ),
-        )
         self.button_reservation.place(x=10, y=530)
 
         # 内容をリセットボタン
@@ -220,6 +212,38 @@ class Application(tk.Frame):
             self.fee.config(text=f"{fee:,}円")
         except ValueError as e:
             self.fee.config(text=f"エラー: {e}")
+            
+    def process_reservation(self):
+        try:
+            # ウィジェットから値を取得
+            name = self.last_name.get() + " " + self.first_name.get()
+            email = self.email.get()
+            people = self.people.get()
+            room_name = self.room_name.get()
+            banquet = self.banquet_var.get()
+            check_in = self.check_in.get()
+            check_out = self.check_out.get()
+            remarks = self.remarks.get("1.0", "end").strip()
+            total = self.fee.cget("text")
+
+            # JSON保存
+            json_storage(name, email, people, room_name, banquet, check_in, check_out, remarks, total)
+            print("予約情報がJSONファイルに保存されました！")
+
+            # メール送信
+            email_notification_system(
+                email=self.email,            # ウィジェットそのものを渡す
+                last_name=self.last_name,
+                banquet_var=self.banquet_var,
+                people=self.people,
+                room_name=self.room_name,
+                result_label=self.result_label,
+            )
+            print("メールが送信されました！")
+        except ValueError as e:
+            print(f"入力エラー: {e}")
+        except Exception as e:
+            print(f"エラーが発生しました: {e}")
 
 
 if __name__ == "__main__":
