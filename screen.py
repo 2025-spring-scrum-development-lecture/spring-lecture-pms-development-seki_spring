@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkcalendar import DateEntry
 from datetime import datetime
 from estimate_calculation import estimate_calculation
+from hide_room import hide_room
 
 class Application(tk.Frame):
     def __init__(self, master):
@@ -41,10 +42,12 @@ class Application(tk.Frame):
         # 宴会の有無
         self.label_banquet = tk.Label(self, text="宴会の有無")
         self.label_banquet.place(x=10, y=90)
-        self.banquet_var = tk.StringVar()
-        self.radio_button_yes = tk.Radiobutton(self, text="あり", variable=self.banquet_var, value="あり")
+        self.banquet_var = tk.StringVar(value='なし')  # 初期値を設定
+        self.radio_button_yes = tk.Radiobutton(self, text="あり", variable=self.banquet_var, value="あり",
+                                            command=lambda: hide_room(self.banquet_var, self.label_room, self.room_name))
         self.radio_button_yes.place(x=150, y=90)
-        self.radio_button_no = tk.Radiobutton(self, text="なし", variable=self.banquet_var, value="なし")
+        self.radio_button_no = tk.Radiobutton(self, text="なし", variable=self.banquet_var, value="なし",
+                                            command=lambda: hide_room(self.banquet_var, self.label_room, self.room_name))
         self.radio_button_no.place(x=200, y=90)
 
         # 人数
