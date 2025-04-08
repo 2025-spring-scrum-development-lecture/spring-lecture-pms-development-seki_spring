@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkcalendar import DateEntry
 from datetime import datetime
+from estimate_calculation import estimate_calculation
 
 class Application(tk.Frame):
     def __init__(self, master):
@@ -105,11 +106,11 @@ class Application(tk.Frame):
         self.label_estimatedfee_text = tk.Label(self, text="見積もり料金")
         self.label_estimatedfee_text.place(x=10, y=490)
 
-        self.fee = tk.Label(self, text="sample")
+        self.fee = tk.Label(self, text="0円")
         self.fee.place(x=150, y=490)
 
         # 予約ボタン
-        self.button_reservation = tk.Button(self, text="予約（確定）")
+        self.button_reservation = tk.Button(self, text="予約（確定）", command=self.calculate_fee)
         self.button_reservation.place(x=10, y=530)
 
         # 内容をリセットボタン
@@ -129,6 +130,21 @@ class Application(tk.Frame):
         self.text_paymentmethod.delete("1.0", tk.END)
         self.remarks.delete("1.0", tk.END)
         self.fee.config(text="-")
+
+    def calculate_fee(self):
+        try:
+            # 入力値を取得
+            banquet = 'true' if self.banquet_var.get() == 'あり' else 'false'
+            people = int(self.people.get())
+            room_name = self.room_name.get()
+
+            # 見積もり計算
+            fee = estimate_calculation(banquet, people, room_name)
+
+            # 見積もり料金を表示
+            self.fee.config(text=f"{fee:,}円")
+        except ValueError as e:
+            self.fee.config(text=f"エラー: {e}")
 
 if __name__ == '__main__':
     root = tk.Tk()
