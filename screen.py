@@ -5,6 +5,7 @@ from datetime import datetime
 from estimate_calculation import estimate_calculation
 from hide_room import hide_room
 
+
 class Application(tk.Frame):
     def __init__(self, master):
         super().__init__(master, width=800, height=600)
@@ -106,14 +107,14 @@ class Application(tk.Frame):
         self.remarks.place(x=150, y=390)
 
         # 見積もり料金
-        self.label_estimatedfee_text = tk.Label(self, text="見積もり料金")
-        self.label_estimatedfee_text.place(x=10, y=490)
+        self.button_estimatedfee_text = tk.Button(self, text="見積もり料金",command=self.calculate_fee)
+        self.button_estimatedfee_text.place(x=10, y=490)
 
         self.fee = tk.Label(self, text="0円")
         self.fee.place(x=150, y=490)
 
         # 予約ボタン
-        self.button_reservation = tk.Button(self, text="予約（確定）", command=self.calculate_fee)
+        self.button_reservation = tk.Button(self, text="予約（確定）")
         self.button_reservation.place(x=10, y=530)
 
         # 内容をリセットボタン
