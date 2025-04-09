@@ -25,34 +25,37 @@ class Application(tk.Frame):
     # ウィジェットを配置して画面を作るメソッド
     def create_widgets(self):
         # お客様のお名前
-        self.label_name = tk.Label(self, text="お客様のお名前")
-        self.label_name.place(x=10, y=10)
+        self.frame_customer = tk.LabelFrame(self, text="お客様情報", padx=10, pady=5)
+        self.frame_customer.place(x=10, y=10, width=780, height=80)
 
-        self.label_last_name = tk.Label(self, text="姓")
-        self.label_last_name.place(x=150, y=10)
+        self.label_last_name = tk.Label(self.frame_customer, text="姓")
+        self.label_last_name.place(x=10, y=10)
 
-        self.last_name = tk.Entry(self, width=15)
-        self.last_name.place(x=190, y=10)
+        self.last_name = tk.Entry(self.frame_customer, width=15)
+        self.last_name.place(x=40, y=10)
 
-        self.label_first_name = tk.Label(self, text="名")
-        self.label_first_name.place(x=350, y=10)
+        self.label_first_name = tk.Label(self.frame_customer, text="名")
+        self.label_first_name.place(x=200, y=10)
 
-        self.first_name = tk.Entry(self, width=15)
-        self.first_name.place(x=380, y=10)
+        self.first_name = tk.Entry(self.frame_customer, width=15)
+        self.first_name.place(x=230, y=10)
 
         # メールアドレス
-        self.label_email = tk.Label(self, text="お客様のメールアドレス")
-        self.label_email.place(x=10, y=50)
+        self.label_email = tk.Label(self.frame_customer, text="お客様のメールアドレス")
+        self.label_email.place(x=400, y=10)
 
-        self.email = tk.Entry(self, width=30)
-        self.email.place(x=150, y=50)
+        self.email = tk.Entry(self.frame_customer, width=30)
+        self.email.place(x=520, y=10)
+        
+        self.frame_booking = tk.LabelFrame(self, text="予約情報", padx=10, pady=5)
+        self.frame_booking.place(x=10, y=100, width=780, height=150)
 
         # 宴会の有無
-        self.label_banquet = tk.Label(self, text="宴会の有無")
-        self.label_banquet.place(x=10, y=90)
+        self.label_banquet = tk.Label(self.frame_booking, text="宴会の有無")
+        self.label_banquet.place(x=10, y=10)
         self.banquet_var = tk.StringVar(value="なし")  # 初期値を設定
         self.radio_button_yes = tk.Radiobutton(
-            self,
+            self.frame_booking,
             text="あり",
             variable=self.banquet_var,
             value="あり",
@@ -60,9 +63,9 @@ class Application(tk.Frame):
                 self.banquet_var, self.label_room, self.room_name
             ),
         )
-        self.radio_button_yes.place(x=150, y=90)
+        self.radio_button_yes.place(x=100, y=10)
         self.radio_button_no = tk.Radiobutton(
-            self,
+            self.frame_booking,
             text="なし",
             variable=self.banquet_var,
             value="なし",
@@ -70,29 +73,29 @@ class Application(tk.Frame):
                 self.banquet_var, self.label_room, self.room_name
             ),
         )
-        self.radio_button_no.place(x=200, y=90)
+        self.radio_button_no.place(x=150, y=10)
 
         # 人数
-        self.label_num_people = tk.Label(self, text="人数")
-        self.label_num_people.place(x=10, y=130)
+        self.label_num_people = tk.Label(self.frame_booking, text="人数")
+        self.label_num_people.place(x=10, y=50)
 
-        self.people = ttk.Combobox(self, values=[str(i) for i in range(1, 11)], width=5)
-        self.people.place(x=150, y=130)
+        self.people = ttk.Combobox(self.frame_booking, values=[str(i) for i in range(1, 11)], width=5)
+        self.people.place(x=100, y=50)
         self.people.set("1")
 
         # チェックインの日
-        self.label_checkin = tk.Label(self, text="チェックインの日")
-        self.label_checkin.place(x=10, y=170)
+        self.label_checkin = tk.Label(self.frame_booking, text="チェックインの日")
+        self.label_checkin.place(x=250, y=10)
 
-        self.check_in = DateEntry(self, width=12, mindate=datetime.today())
-        self.check_in.place(x=150, y=170)
+        self.check_in = DateEntry(self.frame_booking, width=12, mindate=datetime.today())
+        self.check_in.place(x=350, y=10)
 
         # チェックアウトの日
-        self.label_checkout = tk.Label(self, text="チェックアウトの日")
-        self.label_checkout.place(x=10, y=210)
+        self.label_checkout = tk.Label(self.frame_booking, text="チェックアウトの日")
+        self.label_checkout.place(x=250, y=50)
 
-        self.check_out = DateEntry(self, width=12, mindate=datetime.today())
-        self.check_out.place(x=150, y=210)
+        self.check_out = DateEntry(self.frame_booking, width=12, mindate=datetime.today())
+        self.check_out.place(x=350, y=50)
 
         self.room_prices = {
             "見返の間": 30000,
@@ -126,11 +129,11 @@ class Application(tk.Frame):
         }
 
         # 部屋の名前
-        self.label_room = tk.Label(self, text="部屋の名前")
-        self.label_room.place(x=10, y=250)
+        self.label_room = tk.Label(self.frame_booking, text="部屋の名前")
+        self.label_room.place(x=10, y=90)
 
         self.room_name = ttk.Combobox(
-            self,
+            self.frame_booking,
             values=[
                 "見返の間",
                 "茶臼の間",
@@ -147,44 +150,48 @@ class Application(tk.Frame):
                 "和洋室7.5畳（西館）",
             ],
         )
-        self.room_name.place(x=150, y=250)
+        self.room_name.place(x=100, y=90)
 
         # 支払方法
-        self.label_paymentmethod = tk.Label(self, text="支払方法")
-        self.label_paymentmethod.place(x=10, y=290)
+        
+        self.frame_misc = tk.LabelFrame(self, text="支払い情報と備考", padx=10, pady=5)
+        self.frame_misc.place(x=10, y=260, width=780, height=150)
+        
+        self.label_paymentmethod = tk.Label(self.frame_misc, text="支払方法")
+        self.label_paymentmethod.place(x=10, y=10)
 
-        self.text_paymentmethod = tk.Text(self, height=5, width=40)
-        self.text_paymentmethod.place(x=150, y=290)
+        self.text_paymentmethod = tk.Text(self.frame_misc, height=5, width=40)
+        self.text_paymentmethod.place(x=80, y=10)
 
         # 備考
-        self.label_remarks = tk.Label(self, text="備考")
-        self.label_remarks.place(x=10, y=390)
+        self.label_remarks = tk.Label(self.frame_misc, text="備考")
+        self.label_remarks.place(x=370, y=10)
 
-        self.remarks = tk.Text(self, height=5, width=40)
-        self.remarks.place(x=150, y=390)
+        self.remarks = tk.Text(self.frame_misc, height=5, width=40)
+        self.remarks.place(x=430, y=10)
 
         # 見積もり料金
         self.button_estimatedfee_text = tk.Button(
-            self, text="見積もり料金", command=self.calculate_fee
+            self, text="見積もり料金", command=self.calculate_fee, bg="#4a90e2", fg="white"
         )
-        self.button_estimatedfee_text.place(x=10, y=490)
+        self.button_estimatedfee_text.place(x=10, y=430)
 
         self.fee = tk.Label(self, text="0円")
-        self.fee.place(x=150, y=490)
+        self.fee.place(x=150, y=430)
 
         # メール送信結果を表示するラベル
         self.result_label = tk.Label(self, text="", fg="black")
         self.result_label.place(x=10, y=560)
         
-        self.button_reservation = tk.Button(self, text="予約（確定）", command=self.process_reservation)
+        self.button_reservation = tk.Button(self, text="予約（確定）", command=self.process_reservation, bg="#4a90e2", fg="white")
 
-        self.button_reservation.place(x=10, y=530)
+        self.button_reservation.place(x=10, y=480)
 
         # 内容をリセットボタン
         self.button_reset = tk.Button(
-            self, text="内容をリセット", command=self.reset_input_contains
+            self, text="内容をリセット", command=self.reset_input_contains, bg="#e74c3c", fg="white"
         )
-        self.button_reset.place(x=150, y=530)
+        self.button_reset.place(x=150, y=480)
 
     def reset_input_contains(self):
         self.last_name.delete(0, tk.END)
