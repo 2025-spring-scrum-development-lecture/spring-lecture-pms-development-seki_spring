@@ -10,6 +10,7 @@ from email_notification_system import email_notification_system
 from json_code import json_storage
 import json
 import os
+from tkinter import messagebox
 
 
 class Application(tk.Frame):
@@ -229,6 +230,21 @@ class Application(tk.Frame):
             # JSON保存
             json_storage(name, email, people, room_name, banquet, check_in, check_out, remarks, total)
             print("予約情報がJSONファイルに保存されました！")
+            
+            if name and email and check_in and check_out and room_name and people:
+                available = self.room_availability.get(room_name, 0)
+                if available > 0:
+                    self.room_availability[room_name] -= 1  # 空室があるので、部屋の空きを1つ減らす
+                    price = self.room_prices.get(room_name, 0) * int(people)
+                    banquet_text = "あり" if self.banquet_var.get() else "なし"
+                    if self.banquet_var.get():
+                        price += 22400
+                    messagebox.showinfo("予約完了", "予約が完了しました！メールを送信しました。")
+                else:
+                    # 空きがない場合は「満室です」というエラーメッセージを表示
+                    messagebox.showerror("満室", "申し訳ありません。選択された部屋は満室です。")
+            else:
+                messagebox.showerror("エラー", "すべての項目を入力してください")
 
             # メール送信
             email_notification_system(
@@ -244,6 +260,7 @@ class Application(tk.Frame):
             print(f"入力エラー: {e}")
         except Exception as e:
             print(f"エラーが発生しました: {e}")
+            
 
 
 if __name__ == "__main__":
