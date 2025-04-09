@@ -15,7 +15,7 @@ def send_mail(to, subject, body):
     
     msg['Subject'] = subject
     msg['From'] = ID
-    msg['To'] = 'a.seki.sys24@morijyobi.ac.jp' + ',' + 'm.kudou.sys24@morijyobi.ac.jp' + ',' + 's.sato.sys24@morijyobi.ac.jp'
+    msg['To'] = 'm.kudou.sys24@morijyobi.ac.jp'
     
     server = SMTP(HOST, PORT)
     server.starttls()
