@@ -205,7 +205,7 @@ class Application(tk.Frame):
 
     def process_reservation(self):
         try:
-            # 各エントリーから値を取得（前後の空白除去）
+            # ① 入力値の取得と空白除去
             last = self.last_name.get().strip()
             first = self.first_name.get().strip()
             email = self.email.get().strip()
@@ -214,61 +214,69 @@ class Application(tk.Frame):
             room_name = self.room_name.get().strip()
             people = self.people.get().strip()
 
-            # 「名前」については姓と名の両方が必須としています
+            # ② 必須項目の入力チェック
             if not last or not first:
                 messagebox.showerror("入力エラー", "姓と名は必ず入力してください。")
                 return
 
-            # メールアドレスのチェック
             if not email:
                 messagebox.showerror("入力エラー", "メールアドレスを入力してください。")
                 return
 
-            # 他の必須項目が入力されていなければエラーを表示
             if not (check_in and check_out and room_name and people):
                 messagebox.showerror("入力エラー", "すべての項目を入力してください。")
                 return
 
-            # 予約情報の組み立て
-            name = f"{last} {first}"
-            total = self.fee.cget("text")
-            remarks = self.remarks.get("1.0", "end").strip()
+            # ③ 日付の妥当性チェック（例: check_inがcheck_outより前であるか）
+            # ※日付の型が文字列の場合は、適切な日付型に変換して比較してください
+            # ここでは例として、日付フォーマットが "YYYY/MM/DD" であると仮定
+            from datetime import datetime
+            check_in_date = datetime.strptime(check_in, "%Y/%m/%d")
+            check_out_date = datetime.strptime(check_out, "%Y/%m/%d")
+            if check_in_date >= check_out_date:
+                messagebox.showerror("日付エラー", "チェックイン日はチェックアウト日より前である必要があります。")
+                return
 
-            # 予約情報のJSONでの保存 (永続化)
-            json_storage(name, email, people, room_name, self.banquet_var.get(), check_in, check_out, remarks, total)
-            print("予約情報が保存されました！")
-            
-            # 追加の処理があればここに記述
-        except Exception as e:
-            messagebox.showerror("エラー", f"予約処理中にエラーが発生しました: {e}")
-
-            # 宴会ありの場合となしの場合で利用する空室情報を分ける
+            # ④ 部屋の空室チェックと更新
             if self.banquet_var.get() == "あり":
                 rooms_available = self.room_availability_banquet
-                # 宴会の場合は選択肢を固定の4つに制限しているはずなので、
-                # 万が一それ以外が選択されていたらエラーを表示
+                # 許可されている部屋かどうか
                 if room_name not in rooms_available:
                     messagebox.showerror(
                         "エラー",
                         "宴会の場合、選択できる部屋は「和室28畳（西館）」「和室10畳（西館）」「洋室10畳（西館）」「和洋室7.5畳（西館）」に限定されています。"
                     )
                     return
+                # 空室があるか確認
                 if rooms_available[room_name] <= 0:
                     messagebox.showerror("満室", "申し訳ありません。選択された部屋は満室です。")
                     return
-                rooms_available[room_name] -= 1
             else:
                 rooms_available = self.room_availability_all
                 if rooms_available.get(room_name, 0) <= 0:
                     messagebox.showerror("満室", "申し訳ありません。選択された部屋は満室です。")
                     return
-                rooms_available[room_name] -= 1
 
+            # 空室が確認できたので、更新
+            rooms_available[room_name] -= 1
+
+            # ⑤ 予約情報の組み立てと永続化（JSON保存）
+            name = f"{last} {first}"
+            total = self.fee.cget("text")
+            remarks = self.remarks.get("1.0", "end").strip()
+            json_storage(
+                name, email, people, room_name,
+                self.banquet_var.get(), check_in, check_out,
+                remarks, total
+            )
+            print("予約情報が保存されました！")
+
+            # ⑥ 予約完了のメッセージ表示
             messagebox.showinfo("予約完了", "予約が完了しました！メールを送信しました。")
 
-            # メール送信
+            # ⑦ メール送信（入力値を直接渡す）
             email_notification_system(
-                email=self.email,            # ウィジェットそのものを渡す
+                email=self.email,          # ウィジェットそのものを渡す
                 last_name=self.last_name,
                 banquet_var=self.banquet_var,
                 people=self.people,
@@ -276,9 +284,11 @@ class Application(tk.Frame):
                 result_label=self.result_label,
             )
             print("メールが送信されました！")
+
         except ValueError as e:
-            print(f"入力エラー: {e}")
+            messagebox.showerror("入力エラー", f"入力エラー: {e}")
         except Exception as e:
+            messagebox.showerror("エラー", f"予約処理中にエラーが発生しました: {e}")
             print(f"エラーが発生しました: {e}")
 
 if __name__ == "__main__":
