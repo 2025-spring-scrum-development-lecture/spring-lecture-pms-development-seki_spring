@@ -205,25 +205,42 @@ class Application(tk.Frame):
 
     def process_reservation(self):
         try:
-            # ウィジェットから値を取得
-            name = self.last_name.get() + " " + self.first_name.get()
-            email = self.email.get()
-            people = self.people.get()
-            room_name = self.room_name.get()
-            banquet = self.banquet_var.get()
-            check_in = self.check_in.get()
-            check_out = self.check_out.get()
-            remarks = self.remarks.get("1.0", "end").strip()
-            total = self.fee.cget("text")
+            # 各エントリーから値を取得（前後の空白除去）
+            last = self.last_name.get().strip()
+            first = self.first_name.get().strip()
+            email = self.email.get().strip()
+            check_in = self.check_in.get().strip()
+            check_out = self.check_out.get().strip()
+            room_name = self.room_name.get().strip()
+            people = self.people.get().strip()
 
-            # JSON保存（データの永続化）
-            json_storage(name, email, people, room_name, banquet, check_in, check_out, remarks, total)
-            print("予約情報が保存されました！")
-
-            # 必須項目のチェック
-            if not (name and email and check_in and check_out and room_name and people):
-                messagebox.showerror("エラー", "すべての項目を入力してください")
+            # 「名前」については姓と名の両方が必須としています
+            if not last or not first:
+                messagebox.showerror("入力エラー", "姓と名は必ず入力してください。")
                 return
+
+            # メールアドレスのチェック
+            if not email:
+                messagebox.showerror("入力エラー", "メールアドレスを入力してください。")
+                return
+
+            # 他の必須項目が入力されていなければエラーを表示
+            if not (check_in and check_out and room_name and people):
+                messagebox.showerror("入力エラー", "すべての項目を入力してください。")
+                return
+
+            # 予約情報の組み立て
+            name = f"{last} {first}"
+            total = self.fee.cget("text")
+            remarks = self.remarks.get("1.0", "end").strip()
+
+            # 予約情報のJSONでの保存 (永続化)
+            json_storage(name, email, people, room_name, self.banquet_var.get(), check_in, check_out, remarks, total)
+            print("予約情報が保存されました！")
+            
+            # 追加の処理があればここに記述
+        except Exception as e:
+            messagebox.showerror("エラー", f"予約処理中にエラーが発生しました: {e}")
 
             # 宴会ありの場合となしの場合で利用する空室情報を分ける
             if self.banquet_var.get() == "あり":
