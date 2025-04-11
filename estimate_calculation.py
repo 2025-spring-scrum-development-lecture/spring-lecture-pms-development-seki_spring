@@ -16,27 +16,18 @@ def room_calculation(room_name, people, check_in):
         "洋室10畳（西館）": 15400,
         "和洋室7.5畳（西館）": 15400
     }
-    plan_price = {
-        "前沢牛の網焼きとロースト前沢牛の握り付き和食膳プラン": 3000,
-        "【前沢牛】【HP予約特典付き】≪ちょっと贅沢なご夕食≫　前沢牛の網焼きとロースト前沢牛の握り付き和食膳プラン": 3000,
-        "前沢牛＆伊勢海老＆あわび＆ズワイガニのおまねきプラン": 6600,
-        "前沢牛・伊勢海老・あわび・ズワイガニの豪華和食膳プラン": 6000,
-        "【お誕生・記念日プラン】(*≧∇≦)/　　ホールケーキ付♪サプライズでお祝いしましょ♪": 4200,
-        
-    }
-    if room_name in room_prices:
-        fee = room_prices[room_name] * people
-    else:
+    
+    if room_name not in room_prices:
         raise ValueError(f"無効な部屋名: {room_name}")
 
     fee = room_prices[room_name] * people
 
-    # 曜日判定
+    # 曜日判定：チェックインが土曜日なら追加料金を加算
     if check_in:
         day_of_week = check_in.strftime('%A')  # 英語で曜日を取得
         print(f"チェックイン日の曜日: {day_of_week}")  # デバッグ用
         if day_of_week == 'Saturday':  # 土曜日の場合
-            fee += 2000 * people  # 土曜追加料金
+            fee += 2000 * people
 
     return fee
 
