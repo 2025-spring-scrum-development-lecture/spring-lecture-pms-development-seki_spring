@@ -3,11 +3,13 @@ from tkinter import ttk  # ttkをtkinterからインポート
 from mail import send_mail
 
 # 送信ボタンが押されたときに予約情報を収集してメール送信
-def email_notification_system(email, last_name, banquet_var, people, room_name, check_in, check_out, fee, result_label):
-    # すでに渡された値を直接使用（.get()を削除）
-    to = email  # 直接文字列として渡される前提
-    name = last_name  # 直接文字列として渡される前提
 
+def email_notification_system(email, last_name, banquet_var, people, room_name, result_label,check_in, check_out, fee, bus_var):
+    # Tkinterフォームから情報を取得
+    to = email
+    name = last_name
+    bus = bus_var
+    
     # 件名を自動設定
     subject = "ご予約確定のお知らせ"
 
@@ -31,6 +33,8 @@ def email_notification_system(email, last_name, banquet_var, people, room_name, 
 チェックイン日: {check_in}  \n
 チェックアウト日: {check_out}  \n
 見積もり料金: {fee:,}円  \n
+送迎：{bus_var.get()}\n
+
 
 またのご利用をお待ちしております。
 """
