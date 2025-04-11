@@ -1,51 +1,44 @@
 import tkinter as tk
 from tkinter import ttk  # ttkをtkinterからインポート
-from mail import send_mail
+from mail import send_mail  # あなたの独自のメール送信モジュール
 
 # 送信ボタンが押されたときに予約情報を収集してメール送信
+def email_notification_system(email, last_name, banquet_var, people, room_name, result_label, check_in, check_out, fee, bus_var):
+    # 予約情報を取得し、メールの本文を生成
+    try:
+        # 必要な情報を整形して取得
+        to = email.strip()
+        name = last_name.strip() if last_name else "未入力"
+        bus = bus_var.get()  # 送迎オプション
+        subject = "ご予約確定のお知らせ"
 
-def email_notification_system(email, last_name, banquet_var, people, room_name, result_label,check_in, check_out, fee, bus_var):
-    # Tkinterフォームから情報を取得
-    to = email
-    name = last_name
-    bus = bus_var
-    
-    # 件名を自動設定
-    subject = "ご予約確定のお知らせ"
+        # 固定メッセージ部分
+        fixed_message = f"""{name}様\n\nこの度はご予約ありがとうございます。\n以下の通り、予約内容をご確認ください。\n\n"""
 
-    # 固定の文面を定義（改行を含めて整形）
-    fixed_message = f"""
-{name}様
+        # 予約情報を整形
+        reservation_info = f"""\
+【予約情報】
 
-この度はご予約ありがとうございます。
-以下の通り、予約内容をご確認ください。\n
-
-"""
-
-    # 予約情報を整形（項目ごとに改行を追加）
-    reservation_info = f"""
-【予約情報】\n
-
-氏名: {name}\n
-宴会有無: {"あり" if banquet_var == 'true' else "なし"} \n
-人数: {people}名  \n
-部屋: {room_name}  \n
-チェックイン日: {check_in}  \n
-チェックアウト日: {check_out}  \n
-見積もり料金: {fee:,}円  \n
-送迎：{bus_var.get()}\n
-
+氏名: {name}
+宴会有無: {"あり" if banquet_var == 'true' else "なし"}
+人数: {people.strip()}名
+部屋: {room_name.strip()}
+チェックイン日: {check_in.strip()}
+チェックアウト日: {check_out.strip()}
+見積もり料金: {fee:,}円
+送迎: {bus}
 
 またのご利用をお待ちしております。
 """
 
-    # メール本文を結合
-    body = fixed_message + reservation_info
+        # メール本文を生成
+        body = fixed_message + reservation_info
+        print(body)  # デバッグ用に内容確認
 
-    try:
-        # メール送信処理
-        send_mail(to, subject, body)
-        result_label.config(text="メールを送信しました！", fg="green")  # 成功の表示
+        # メール送信
+        send_mail(to, subject, body)  # メール送信処理を実行
+        result_label.config(text="メールを送信しました！", fg="green")
+    
     except Exception as e:
-        # エラーハンドリング
-        result_label.config(text=f"送信に失敗しました: {str(e)}", fg="red")  # 失敗の表示
+        # エラー処理
+        result_label.config(text=f"送信に失敗しました: {str(e)}", fg="red")

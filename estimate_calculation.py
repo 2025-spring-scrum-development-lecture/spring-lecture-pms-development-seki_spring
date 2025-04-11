@@ -16,8 +16,17 @@ def room_calculation(room_name, people, check_in):
         "洋室10畳（西館）": 15400,
         "和洋室7.5畳（西館）": 15400
     }
-    
-    if room_name not in room_prices:
+    plan_price = {
+        "前沢牛の網焼きとロースト前沢牛の握り付き和食膳プラン": 3000,
+        "【前沢牛】【HP予約特典付き】≪ちょっと贅沢なご夕食≫　前沢牛の網焼きとロースト前沢牛の握り付き和食膳プラン": 3000,
+        "前沢牛＆伊勢海老＆あわび＆ズワイガニのおまねきプラン": 6600,
+        "前沢牛・伊勢海老・あわび・ズワイガニの豪華和食膳プラン": 6000,
+        "【お誕生・記念日プラン】(*≧∇≦)/　　ホールケーキ付♪サプライズでお祝いしましょ♪": 4200,
+        
+    }
+    if room_name in room_prices:
+        fee = room_prices[room_name] * people
+    else:
         raise ValueError(f"無効な部屋名: {room_name}")
 
     fee = room_prices[room_name] * people

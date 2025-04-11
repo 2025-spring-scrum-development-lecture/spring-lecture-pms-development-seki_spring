@@ -4,7 +4,10 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def send_mail(to, subject, body):
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     ID = 'm.kudou.sys24@morijyobi.ac.jp'
     PASS = os.environ['MAIL_PASS']
     HOST = 'smtp.gmail.com'
