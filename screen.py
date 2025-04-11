@@ -325,16 +325,15 @@ class Application(tk.Frame):
 
             # # ⑦ メール送信（入力値を直接渡す）
             email_notification_system(
-
-                self.email.get().strip(),       # ウィジェットそのものを渡す
-                last_name=self.last_name,
-                banquet_var=self.banquet_var,
-                people=self.people,
-                room_name=self.room_name,
+                email=self.email.get().strip(),       # 値を取得する
+                last_name=self.last_name.get().strip(),  # `get()`を使って入力値を取得
+                banquet_var=self.banquet_var.get(),      # BooleanVar/StringVarから値を取得
+                people=self.people.get().strip(),        # `get()`を追加
+                room_name=self.room_name.get().strip(),  # `get()`を追加
                 result_label=self.result_label,
-                check_in=self.check_in.get().strip(),    # チェックイン日
-                check_out=self.check_out.get().strip(),  # チェックアウト日
-                fee=int(self.fee.cget("text").replace(",", "").strip("円")),  # 合計料金を整形
+                check_in=self.check_in.get().strip(),    # 正しい日付値を取得
+                check_out=self.check_out.get().strip(),
+                fee=int(self.fee.cget("text").replace(",", "").strip("円")),
                 bus_var=self.bus_var,
             )
 
