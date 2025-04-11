@@ -4,7 +4,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def send_mail(to, subject, body):
-    ID = ''
+    ID = 'a.seki.sys24@morijyobi.ac.jp'
     PASS = os.environ['MAIL_PASS']
     HOST = 'smtp.gmail.com'
     PORT = 587
@@ -15,7 +15,7 @@ def send_mail(to, subject, body):
     
     msg['Subject'] = subject
     msg['From'] = ID
-    msg['To'] = 'm.kudou.sys24@morijyobi.ac.jp'
+    msg['To'] = 'a.seki.sys24@morijyobi.ac.jp'
     
     server = SMTP(HOST, PORT)
     server.starttls()

@@ -7,6 +7,7 @@ from email_notification_system import email_notification_system
 from json_code import json_storage
 from tkinter import messagebox
 
+
 class Application(tk.Frame):
     def __init__(self, master):
         super().__init__(master, width=800, height=600)
@@ -233,14 +234,20 @@ class Application(tk.Frame):
 
     def calculate_fee(self):
         try:
+            # チェックイン日付を取得
+            check_in_date_str = self.check_in.get()  # tkinterフォームから取得
+
             # 入力値を取得
             banquet = "true" if self.banquet_var.get() == "あり" else "false"
             people = int(self.people.get())
             room_name = self.room_name.get()
-            fee = estimate_calculation(banquet, people, room_name)
+            
+             # 見積もり料金を計算（チェックイン日付を追加）
+            fee = estimate_calculation(banquet, people, check_in_date_str, room_name)
             self.fee.config(text=f"{fee:,}円")
         except ValueError as e:
             self.fee.config(text=f"エラー: {e}")
+            
 
     def process_reservation(self):
         try:
@@ -316,17 +323,20 @@ class Application(tk.Frame):
             # ⑥ 予約完了のメッセージ表示
             messagebox.showinfo("予約完了", "予約が完了しました！メールを送信しました。")
 
-            # ⑦ メール送信（入力値を直接渡す）
+            # # ⑦ メール送信（入力値を直接渡す）
             email_notification_system(
+
                 self.email.get().strip(),       # ウィジェットそのものを渡す
                 last_name=self.last_name,
                 banquet_var=self.banquet_var,
                 people=self.people,
                 room_name=self.room_name,
                 result_label=self.result_label,
+                check_in=self.check_in.get().strip(),    # チェックイン日
+                check_out=self.check_out.get().strip(),  # チェックアウト日
+                fee=int(self.fee.cget("text").replace(",", "").strip("円")),  # 合計料金を整形
                 bus_var=self.bus_var,
             )
-            print("メールが送信されました！")
 
         except ValueError as e:
             messagebox.showerror("入力エラー", f"入力エラー: {e}")
