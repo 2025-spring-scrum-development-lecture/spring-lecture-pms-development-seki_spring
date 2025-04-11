@@ -113,14 +113,14 @@ class Application(tk.Frame):
 
         # チェックイン・チェックアウトの日付
         self.label_checkin = tk.Label(self.frame_booking, text="チェックインの日")
-        self.label_checkin.place(x=250, y=10)
+        self.label_checkin.place(x=300, y=10)
         self.check_in = DateEntry(self.frame_booking, width=12, mindate=datetime.today())
-        self.check_in.place(x=350, y=10)
+        self.check_in.place(x=400, y=10)
 
         self.label_checkout = tk.Label(self.frame_booking, text="チェックアウトの日")
-        self.label_checkout.place(x=250, y=50)
+        self.label_checkout.place(x=300, y=50)
         self.check_out = DateEntry(self.frame_booking, width=12, mindate=datetime.today())
-        self.check_out.place(x=350, y=50)
+        self.check_out.place(x=400, y=50)
 
         # 部屋の名前
         self.label_room = tk.Label(self.frame_booking, text="部屋の名前")
@@ -145,8 +145,24 @@ class Application(tk.Frame):
         self.room_name.place(x=100, y=90)
         self.room_name.set("和室28畳（西館）")
         
+        self.all_plans = [
+            "なし",
+            "前沢牛の網焼きとロースト前沢牛の握り付き和食膳プラン",
+            "【前沢牛】【HP予約特典付き】≪ちょっと贅沢なご夕食≫　前沢牛の網焼きとロースト前沢牛の握り付き和食膳プラン",
+            "前沢牛＆伊勢海老＆あわび＆ズワイガニのおまねきプラン",
+            "前沢牛・伊勢海老・あわび・ズワイガニの豪華和食膳プラン",
+            "【お誕生・記念日プラン】(*≧∇≦)/　　ホールケーキ付♪サプライズでお祝いしましょ♪"
+        ]
+        self.plan_label = tk.Label(self.frame_booking, text="プラン")
+        self.plan_label.place(x=300, y=90)
+
+        self.plans = ttk.Combobox(self.frame_booking, values=self.all_plans)
+        self.plans.place(x=400, y=90)
+        self.plans.set("なし")
+        
+
         self.label_bus = tk.Label(self.frame_booking, text="送迎の有無")
-        self.label_bus.place(x=250, y=90)
+        self.label_bus.place(x=550, y=10)
         
         self.bus_var = tk.StringVar(value="なし")  # 初期値を設定
         # ここでコールバックを設定して、選択変更時に部屋の選択肢を更新する
@@ -156,15 +172,14 @@ class Application(tk.Frame):
             variable=self.bus_var,
             value="あり",
         )
-        self.bus_radio_button_yes.place(x=350, y=90)
+        self.bus_radio_button_yes.place(x=700, y=10)
         self.bus_radio_button_no = tk.Radiobutton(
             self.frame_booking,
             text="なし",
             variable=self.bus_var,
             value="なし",
         )
-        self.bus_radio_button_no.place(x=400, y=90)
-        
+        self.bus_radio_button_no.place(x=650, y=10)
 
         # 支払情報と備考のFrame
         self.frame_misc = tk.LabelFrame(self, text="支払い情報と備考", padx=10, pady=5)
@@ -231,27 +246,29 @@ class Application(tk.Frame):
         self.room_name.config(values=self.all_rooms)
         self.room_name.set("和室28畳（西館）")
         self.bus_var.set("なし")
+        self.plans.set("なし")
 
     def calculate_fee(self):
         try:
-            # チェックイン日付を取得
-            check_in_date_str = self.check_in.get()  # tkinterフォームから取得
-
-            # 入力値を取得
-            banquet = "true" if self.banquet_var.get() == "あり" else "false"
-            people = int(self.people.get())
-            room_name = self.room_name.get()
-            
-             # 見積もり料金を計算（チェックイン日付を追加）
-            fee = estimate_calculation(banquet, people, check_in_date_str, room_name)
+            room = self.room_name.get().strip()
+            plan = self.plans.get().strip()
+            banquet = "false"
+            check_in_str = self.check_in.get().strip()
+            from datetime import datetime
+            if "/" in check_in_str:
+                check_in_str = check_in_str.replace("/", "-")
+            check_in = datetime.strptime(check_in_str, "%Y-%m-%d")
+            people_str = self.people.get().strip()
+            people = int(people_str)
+            fee = estimate_calculation(banquet, people, check_in, room_name=room, plan=plan)
+            # 計算結果を表示用ウィジェットに設定（常に文字列形式）
             self.fee.config(text=f"{fee:,}円")
-        except ValueError as e:
-            self.fee.config(text=f"エラー: {e}")
-            
+        except Exception as e:
+            tk.messagebox.showerror("エラー", f"料金計算に失敗しました: {e}")
+            print(f"料金計算に失敗しました: {e}")
 
     def process_reservation(self):
         try:
-            # ① 入力値の取得と空白除去
             last = self.last_name.get().strip()
             first = self.first_name.get().strip()
             email_user = self.email.get().strip()
@@ -261,41 +278,29 @@ class Application(tk.Frame):
             check_out = self.check_out.get().strip()
             room_name = self.room_name.get().strip()
             people = self.people.get().strip()
-
-            # ② 必須項目の入力チェック
             if not last or not first:
                 messagebox.showerror("入力エラー", "姓と名は必ず入力してください。")
                 return
-
             if not email_user:
                 messagebox.showerror("入力エラー", "メールアドレスを入力してください。")
                 return
-
             if not (check_in and check_out and room_name and people):
                 messagebox.showerror("入力エラー", "すべての項目を入力してください。")
                 return
-
-            # ③ 日付の妥当性チェック（例: check_inがcheck_outより前であるか）
-            # ※日付の型が文字列の場合は、適切な日付型に変換して比較してください
-            # ここでは例として、日付フォーマットが "YYYY/MM/DD" であると仮定
             from datetime import datetime
             check_in_date = datetime.strptime(check_in, "%Y/%m/%d")
             check_out_date = datetime.strptime(check_out, "%Y/%m/%d")
             if check_in_date >= check_out_date:
                 messagebox.showerror("日付エラー", "チェックイン日はチェックアウト日より前である必要があります。")
                 return
-
-            # ④ 部屋の空室チェックと更新
             if self.banquet_var.get() == "あり":
                 rooms_available = self.room_availability_banquet
-                # 許可されている部屋かどうか
                 if room_name not in rooms_available:
                     messagebox.showerror(
                         "エラー",
                         "宴会の場合、選択できる部屋は「和室28畳（西館）」「和室10畳（西館）」「洋室10畳（西館）」「和洋室7.5畳（西館）」に限定されています。"
                     )
                     return
-                # 空室があるか確認
                 if rooms_available[room_name] <= 0:
                     messagebox.showerror("満室", "申し訳ありません。選択された部屋は満室です。")
                     return
@@ -304,11 +309,7 @@ class Application(tk.Frame):
                 if rooms_available.get(room_name, 0) <= 0:
                     messagebox.showerror("満室", "申し訳ありません。選択された部屋は満室です。")
                     return
-
-            # 空室が確認できたので、更新
             rooms_available[room_name] -= 1
-
-            # ⑤ 予約情報の組み立てと永続化（JSON保存）
             name = f"{last} {first}"
             total = self.fee.cget("text")
             remarks = self.remarks.get("1.0", "end").strip()
@@ -319,26 +320,22 @@ class Application(tk.Frame):
                 self.bus_var.get()
             )
             print("予約情報が保存されました！")
-
-            # ⑥ 予約完了のメッセージ表示
             messagebox.showinfo("予約完了", "予約が完了しました！メールを送信しました。")
-
-            # # ⑦ メール送信（入力値を直接渡す）
             email_notification_system(
-                email=self.email.get().strip(),       # 値を取得する
-                last_name=self.last_name.get().strip(),  # `get()`を使って入力値を取得
-                banquet_var=self.banquet_var.get(),      # BooleanVar/StringVarから値を取得
-                people=self.people.get().strip(),        # `get()`を追加
-                room_name=self.room_name.get().strip(),  # `get()`を追加
+                email=self.email.get().strip(),
+                last_name=self.last_name.get().strip(),
+                banquet_var=self.banquet_var.get(),
+                people=self.people.get().strip(),
+                room_name=self.room_name.get().strip(),
                 result_label=self.result_label,
-                check_in=self.check_in.get().strip(),    # 正しい日付値を取得
+                check_in=self.check_in.get().strip(),
                 check_out=self.check_out.get().strip(),
-                fee=int(self.fee.cget("text").replace(",", "").strip("円")),
+                fee=int(str(self.fee.cget("text")).replace(",", "").strip("円")),
                 bus_var=self.bus_var,
             )
-
         except ValueError as e:
             messagebox.showerror("入力エラー", f"入力エラー: {e}")
+            print(f"入力エラー: {e}")
         except Exception as e:
             messagebox.showerror("エラー", f"予約処理中にエラーが発生しました: {e}")
             print(f"エラーが発生しました: {e}")
