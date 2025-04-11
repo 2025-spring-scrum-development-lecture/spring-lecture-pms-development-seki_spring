@@ -4,7 +4,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def send_mail(to, subject, body):
-    ID = 'a.seki.sys24@morijyobi.ac.jp'
+
+    ID = 'm.kudou.sys24@morijyobi.ac.jp'
     PASS = os.environ['MAIL_PASS']
     HOST = 'smtp.gmail.com'
     PORT = 587

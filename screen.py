@@ -113,14 +113,14 @@ class Application(tk.Frame):
 
         # チェックイン・チェックアウトの日付
         self.label_checkin = tk.Label(self.frame_booking, text="チェックインの日")
-        self.label_checkin.place(x=250, y=10)
+        self.label_checkin.place(x=300, y=10)
         self.check_in = DateEntry(self.frame_booking, width=12, mindate=datetime.today())
-        self.check_in.place(x=350, y=10)
+        self.check_in.place(x=400, y=10)
 
         self.label_checkout = tk.Label(self.frame_booking, text="チェックアウトの日")
-        self.label_checkout.place(x=250, y=50)
+        self.label_checkout.place(x=300, y=50)
         self.check_out = DateEntry(self.frame_booking, width=12, mindate=datetime.today())
-        self.check_out.place(x=350, y=50)
+        self.check_out.place(x=400, y=50)
 
         # 部屋の名前
         self.label_room = tk.Label(self.frame_booking, text="部屋の名前")
@@ -141,12 +141,22 @@ class Application(tk.Frame):
             "洋室10畳（西館）",
             "和洋室7.5畳（西館）",
         ]
+        
+        self.all_plans = [
+            "なし",
+            "前沢牛の網焼きとロースト前沢牛の握り付き和食膳プラン",
+            "【前沢牛】【HP予約特典付き】≪ちょっと贅沢なご夕食≫　前沢牛の網焼きとロースト前沢牛の握り付き和食膳プラン",
+            "前沢牛＆伊勢海老＆あわび＆ズワイガニのおまねきプラン",
+            "前沢牛・伊勢海老・あわび・ズワイガニの豪華和食膳プラン",
+            "【お誕生・記念日プラン】(*≧∇≦)/　　ホールケーキ付♪サプライズでお祝いしましょ♪"
+        ]
         self.room_name = ttk.Combobox(self.frame_booking, values=self.all_rooms)
         self.room_name.place(x=100, y=90)
         self.room_name.set("和室28畳（西館）")
         
+
         self.label_bus = tk.Label(self.frame_booking, text="送迎の有無")
-        self.label_bus.place(x=250, y=90)
+        self.label_bus.place(x=550, y=10)
         
         self.bus_var = tk.StringVar(value="なし")  # 初期値を設定
         # ここでコールバックを設定して、選択変更時に部屋の選択肢を更新する
@@ -156,15 +166,21 @@ class Application(tk.Frame):
             variable=self.bus_var,
             value="あり",
         )
-        self.bus_radio_button_yes.place(x=350, y=90)
+        self.bus_radio_button_yes.place(x=700, y=10)
         self.bus_radio_button_no = tk.Radiobutton(
             self.frame_booking,
             text="なし",
             variable=self.bus_var,
             value="なし",
         )
-        self.bus_radio_button_no.place(x=400, y=90)
+        self.bus_radio_button_no.place(x=650, y=10)
         
+
+        self.plan_label = tk.Label(self.frame_booking, text="プラン")
+        self.plan_label.place(x=300, y=90)
+
+        self.plans = ttk.Combobox(self.frame_booking, values=self.all_plans)
+        self.plans.place(x=400, y=90)
 
         # 支払情報と備考のFrame
         self.frame_misc = tk.LabelFrame(self, text="支払い情報と備考", padx=10, pady=5)
