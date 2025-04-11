@@ -2,7 +2,7 @@ import os
 import json
 from datetime import datetime
 
-def json_storage(name, email, people, room_name, banquet, check_in, check_out, remarks, total, filename="customer_list.json"):
+def json_storage(name, email, people, room_name, banquet, check_in, check_out, remarks, total, bus, filename="customer_list.json"):
     new_entry = {
         "name": name,
         "email": email,
@@ -12,7 +12,8 @@ def json_storage(name, email, people, room_name, banquet, check_in, check_out, r
         "check_in": check_in,
         "check_out": check_out,
         "remarks": remarks,
-        "total": total
+        "total": total,
+        "bus": bus
     }
     print(f"現在の作業ディレクトリ: {os.getcwd()}")
     print(new_entry)

@@ -55,10 +55,27 @@ class Application(tk.Frame):
         self.first_name = tk.Entry(self.frame_customer, width=15)
         self.first_name.place(x=230, y=10)
 
-        self.label_email = tk.Label(self.frame_customer, text="お客様のメールアドレス")
-        self.label_email.place(x=400, y=10)
+        self.label_email = tk.Label(self.frame_customer, text="メールアドレス")
+        self.label_email.place(x=350, y=10)
         self.email = tk.Entry(self.frame_customer, width=30)
-        self.email.place(x=520, y=10)
+        self.email.place(x=425, y=10)
+        
+        self.email_careers = [
+            "@docomo.ne.jp",
+            "@au.com",
+            "@ezweb.ne.jp",
+            "@softbank.ne.jp",
+            "@i.softbank.jp",
+            "@rakumail.jp",
+            "@uqmobile.jp",
+            "@y-mobile.ne.jp",
+            "@morijyobi.ac.jp",
+            "@gmail.com",
+        ]
+        
+        self.combobox_email = ttk.Combobox(self.frame_customer, values=self.email_careers)
+        self.combobox_email.place(x=610, y=10)
+        self.combobox_email.set("@morijyobi.ac.jp")
 
         # 予約情報のFrame
         self.frame_booking = tk.LabelFrame(self, text="予約情報", padx=10, pady=5)
@@ -126,6 +143,27 @@ class Application(tk.Frame):
         self.room_name = ttk.Combobox(self.frame_booking, values=self.all_rooms)
         self.room_name.place(x=100, y=90)
         self.room_name.set("和室28畳（西館）")
+        
+        self.label_bus = tk.Label(self.frame_booking, text="送迎の有無")
+        self.label_bus.place(x=250, y=90)
+        
+        self.bus_var = tk.StringVar(value="なし")  # 初期値を設定
+        # ここでコールバックを設定して、選択変更時に部屋の選択肢を更新する
+        self.bus_radio_button_yes = tk.Radiobutton(
+            self.frame_booking,
+            text="あり",
+            variable=self.bus_var,
+            value="あり",
+        )
+        self.bus_radio_button_yes.place(x=350, y=90)
+        self.bus_radio_button_no = tk.Radiobutton(
+            self.frame_booking,
+            text="なし",
+            variable=self.bus_var,
+            value="なし",
+        )
+        self.bus_radio_button_no.place(x=400, y=90)
+        
 
         # 支払情報と備考のFrame
         self.frame_misc = tk.LabelFrame(self, text="支払い情報と備考", padx=10, pady=5)
@@ -191,6 +229,7 @@ class Application(tk.Frame):
         # 予約時の部屋選択肢もリセット
         self.room_name.config(values=self.all_rooms)
         self.room_name.set("和室28畳（西館）")
+        self.bus_var.set("なし")
 
     def calculate_fee(self):
         try:
@@ -208,7 +247,9 @@ class Application(tk.Frame):
             # ① 入力値の取得と空白除去
             last = self.last_name.get().strip()
             first = self.first_name.get().strip()
-            email = self.email.get().strip()
+            email_user = self.email.get().strip()
+            email_domain = self.combobox_email.get().strip
+            full_email = f"{email_user}{email_domain}"
             check_in = self.check_in.get().strip()
             check_out = self.check_out.get().strip()
             room_name = self.room_name.get().strip()
@@ -219,7 +260,7 @@ class Application(tk.Frame):
                 messagebox.showerror("入力エラー", "姓と名は必ず入力してください。")
                 return
 
-            if not email:
+            if not email_user:
                 messagebox.showerror("入力エラー", "メールアドレスを入力してください。")
                 return
 
@@ -265,9 +306,10 @@ class Application(tk.Frame):
             total = self.fee.cget("text")
             remarks = self.remarks.get("1.0", "end").strip()
             json_storage(
-                name, email, people, room_name,
+                name, full_email, people, room_name,
                 self.banquet_var.get(), check_in, check_out,
-                remarks, total
+                remarks, total,
+                self.bus_var.get()
             )
             print("予約情報が保存されました！")
 
@@ -276,12 +318,13 @@ class Application(tk.Frame):
 
             # ⑦ メール送信（入力値を直接渡す）
             email_notification_system(
-                email=self.email,          # ウィジェットそのものを渡す
+                self.email.get().strip(),       # ウィジェットそのものを渡す
                 last_name=self.last_name,
                 banquet_var=self.banquet_var,
                 people=self.people,
                 room_name=self.room_name,
                 result_label=self.result_label,
+                bus_var=self.bus_var,
             )
             print("メールが送信されました！")
 
